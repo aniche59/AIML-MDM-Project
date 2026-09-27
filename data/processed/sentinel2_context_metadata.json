@@ -1,0 +1,60 @@
+{
+  "dataset_name": "Sentinel-2 MSI Level-2A Surface Reflectance Context Layer",
+  "study_area": {
+    "name": "Dongri Buzurg Manganese Mine & Surrounds",
+    "district": "Bhandara District",
+    "state": "Maharashtra",
+    "country": "India",
+    "center_latitude": 21.5317,
+    "center_longitude": 79.7044,
+    "bounding_box_wgs84": {
+      "min_lon": 79.67,
+      "min_lat": 21.5,
+      "max_lon": 79.74,
+      "max_lat": 21.56
+    }
+  },
+  "imagery_details": {
+    "source": "Copernicus Sentinel-2 (ESA) via Google Earth Engine / Copernicus Open Access Hub",
+    "processing_level": "Level-2A (Bottom-of-Atmosphere Surface Reflectance)",
+    "sensing_date": "2024-03-15",
+    "cloud_cover_percentage": 1.2,
+    "spatial_resolution_meters": 10,
+    "spectral_bands": [
+      {
+        "band": "B2",
+        "name": "Blue",
+        "wavelength_nm": 490,
+        "resolution": "10m"
+      },
+      {
+        "band": "B3",
+        "name": "Green",
+        "wavelength_nm": 560,
+        "resolution": "10m"
+      },
+      {
+        "band": "B4",
+        "name": "Red",
+        "wavelength_nm": 665,
+        "resolution": "10m"
+      },
+      {
+        "band": "B8",
+        "name": "Near Infrared (NIR)",
+        "wavelength_nm": 842,
+        "resolution": "10m"
+      }
+    ],
+    "composite_type": "Cloud-free dry-season True Color (RGB) & False Color (NIR-Red-Green)",
+    "derived_indices": [
+      "NDVI (Normalized Difference Vegetation Index) for vegetation/mine excavation footprint tracking"
+    ]
+  },
+  "data_provenance": {
+    "retrieval_date": "2026-09-27",
+    "data_status": "public_reference",
+    "usage_in_minepulse": "Provides high-resolution optical surface context, open-cast pit boundary reference, and regional vegetation/land-use backdrop.",
+    "limitation_note": "Optical satellite imagery observes surface terrain and excavation footprint. It does not penetrate subsurface geological layers to measure underground manganese reserve tonnage directly."
+  }
+}

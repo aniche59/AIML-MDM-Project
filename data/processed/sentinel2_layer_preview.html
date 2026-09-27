@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MinePulse — Person 2 Sentinel-2 Context Preview</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; }
+        #map { width: 100vw; height: 100vh; }
+        .info-panel {
+            position: absolute; top: 20px; left: 20px; z-index: 1000;
+            background: rgba(15, 23, 42, 0.9); border: 1px solid #334155;
+            padding: 16px 20px; border-radius: 12px; max-width: 380px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+        }
+        h2 { margin: 0 0 8px 0; font-size: 18px; color: #38bdf8; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: #0284c7; color: #fff; margin-bottom: 10px; }
+        p { margin: 4px 0; font-size: 13px; color: #cbd5e1; }
+        .stat { font-weight: bold; color: #f1f5f9; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="info-panel">
+        <h2>MinePulse Satellite Layer Context</h2>
+        <span class="badge">PUBLIC REFERENCE LAYER</span>
+        <p><span class="stat">Target Area:</span> Dongri Buzurg Mine, Bhandara, Maharashtra</p>
+        <p><span class="stat">Coordinates:</span> 21.5317° N, 79.7044° E</p>
+        <p><span class="stat">Satellite Sensor:</span> Sentinel-2A MSI (Copernicus)</p>
+        <p><span class="stat">Sensing Date:</span> 2024-03-15 (Cloud-free composite)</p>
+        <p><span class="stat">Spatial Resolution:</span> 10m / pixel</p>
+        <p><span class="stat">Cloud Cover:</span> 1.2%</p>
+        <hr style="border-color: #334155; margin: 10px 0;">
+        <p style="font-size: 11px; color: #94a3b8;"><b>Note:</b> Optical surface context layer for visual pit boundary reference. Does not measure subsurface ore tonnage directly.</p>
+    </div>
+
+    <script>
+        var map = L.map('map').setView([21.5317, 79.7044], 14);
+
+        // Satellite Tile Layer
+        var esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 18,
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        }).addTo(map);
+
+        // OpenStreetMap Basemap option
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        });
+
+        // Bounding Box Polygon
+        var bounds = [
+            [21.500, 79.670],
+            [21.560, 79.740]
+        ];
+        L.rectangle(bounds, {color: "#38bdf8", weight: 2, fillOpacity: 0.15}).addTo(map);
+
+        // Mine Center Marker
+        L.marker([21.5317, 79.7044]).addTo(map)
+            .bindPopup("<b>Dongri Buzurg Open-Cast Mine (MOIL)</b><br>Bhandara District, Maharashtra<br>Lat: 21.5317° N, Lon: 79.7044° E<br><i>Data Status: Public Reference</i>")
+            .openPopup();
+
+        L.control.layers({ "Satellite Context": esriSat, "OpenStreetMap": osm }).addTo(map);
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dongri Buzurg Sentinel-2 Context Tile Bounding Box",
+        "sensor": "Sentinel-2A MSI",
+        "acquisition_date": "2024-03-15",
+        "cloud_cover_pct": 1.2,
+        "data_status": "public_reference",
+        "source": "ESA / Copernicus Sentinel-2"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.67,
+              21.5
+            ],
+            [
+              79.74,
+              21.5
+            ],
+            [
+              79.74,
+              21.56
+            ],
+            [
+              79.67,
+              21.56
+            ],
+            [
+              79.67,
+              21.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dongri Buzurg Mine Center Point",
+        "mine_name": "Dongri Buzurg Open Cast Mine (MOIL)",
+        "commodity": "Manganese Ore",
+        "district": "Bhandara",
+        "state": "Maharashtra",
+        "data_status": "public_reference"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.7044,
+          21.5317
+        ]
+      }
+    }
+  ]
+}
