@@ -3,51 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MinePulse — SIH26009 Manganese Reserve & Shortfall Planning System</title>
-    <!-- Google Fonts -->
+    <title>MinePulse — Manganese Reserve & Shortfall Planning System</title>
+    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Heat Plugin -->
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Consolidated Master Data -->
+    <!-- Master Data -->
     <script src="data/processed/minepulse_master_data.js"></script>
+
     <style>
+        /* Earthy Mining & Pastel Industrial Palette */
         :root {
-            --bg-base: #090d16;
-            --bg-surface: #111827;
-            --bg-card: rgba(17, 24, 39, 0.75);
-            --bg-card-hover: rgba(31, 41, 55, 0.85);
-            --border-color: #1f2937;
-            --border-highlight: #374151;
+            --bg-base: #14171A;
+            --bg-surface: #1E2227;
+            --bg-card: #252A30;
+            --bg-card-hover: #2E343C;
+            --border-color: #353C45;
+            --border-highlight: #48525E;
             
-            --primary: #38bdf8;
-            --primary-glow: rgba(56, 189, 248, 0.25);
-            --secondary: #818cf8;
-            --accent: #f59e0b;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            /* Pastel Mining Accent Colors */
+            --copper-terracotta: #D9825B;
+            --pastel-amber: #E5B27D;
+            --pastel-sage: #8CB399;
+            --pastel-rust: #E07A5F;
+            --pastel-sand: #F4F1DE;
             
-            --text-main: #f9fafb;
-            --text-muted: #9ca3af;
-            --text-dim: #6b7280;
+            --text-main: #F4F1DE;
+            --text-muted: #A3B1B6;
+            --text-dim: #717D83;
             
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.15);
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
         }
 
         body {
@@ -59,16 +63,15 @@
             overflow-x: hidden;
         }
 
-        /* Scrollbar */
+        /* Scrollbars */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-base); }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        ::-webkit-scrollbar-thumb { background: #353C45; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #48525E; }
 
-        /* Top Navbar */
+        /* Top Header Navigation */
         .navbar {
-            background: rgba(17, 24, 39, 0.85);
-            backdrop-filter: blur(16px);
+            background: #1A1E22;
             border-bottom: 1px solid var(--border-color);
             padding: 14px 28px;
             display: flex;
@@ -77,41 +80,39 @@
             position: sticky;
             top: 0;
             z-index: 1100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .brand-icon {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: var(--radius-md);
-            background: linear-gradient(135deg, #0284c7, #6366f1);
+            background: linear-gradient(135deg, var(--copper-terracotta), var(--pastel-amber));
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            color: #fff;
-            box-shadow: var(--shadow-glow);
+            color: #14171A;
         }
 
         .brand-text h1 {
             font-size: 20px;
             font-weight: 700;
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
+            color: var(--pastel-sand);
+            letter-spacing: -0.3px;
         }
 
         .brand-text span {
             font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
         }
 
         .nav-controls {
@@ -131,7 +132,7 @@
             font-size: 13px;
         }
 
-        .site-select-box i { color: var(--primary); }
+        .site-select-box i { color: var(--copper-terracotta); }
 
         .site-select-box select {
             background: transparent;
@@ -143,54 +144,102 @@
             cursor: pointer;
         }
 
-        .nav-badges {
+        /* Interactive Filter Pills */
+        .filter-pills {
             display: flex;
             gap: 8px;
         }
 
-        .badge {
+        .pill-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            user-select: none;
         }
 
-        .badge-public { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-        .badge-official { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge-simulated { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .pill-public {
+            background: rgba(229, 178, 125, 0.12);
+            color: var(--pastel-amber);
+            border-color: rgba(229, 178, 125, 0.3);
+        }
 
-        /* Main Container Layout */
+        .pill-public.active, .pill-public:hover {
+            background: var(--pastel-amber);
+            color: #14171A;
+        }
+
+        .pill-official {
+            background: rgba(140, 179, 153, 0.12);
+            color: var(--pastel-sage);
+            border-color: rgba(140, 179, 153, 0.3);
+        }
+
+        .pill-official.active, .pill-official:hover {
+            background: var(--pastel-sage);
+            color: #14171A;
+        }
+
+        .pill-simulated {
+            background: rgba(217, 130, 91, 0.12);
+            color: var(--copper-terracotta);
+            border-color: rgba(217, 130, 91, 0.3);
+        }
+
+        .pill-simulated.active, .pill-simulated:hover {
+            background: var(--copper-terracotta);
+            color: #14171A;
+        }
+
+        .pill-heat {
+            background: rgba(224, 122, 95, 0.15);
+            color: var(--pastel-rust);
+            border-color: rgba(224, 122, 95, 0.4);
+        }
+        .pill-heat.active, .pill-heat:hover {
+            background: var(--pastel-rust);
+            color: #14171A;
+        }
+
+        /* Dashboard Grid Layout */
         .app-container {
             display: grid;
-            grid-template-columns: 1fr 420px;
+            grid-template-columns: 1fr 390px;
             gap: 20px;
             padding: 20px 28px;
             flex: 1;
         }
 
-        /* Left Side: Map & Charts */
         .left-column {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        /* Glassmorphic Panel Card */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Card Container */
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 20px;
             display: flex;
             flex-direction: column;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            transition: border-color 0.2s;
         }
 
         .card-header {
@@ -204,13 +253,13 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-main);
         }
 
         .card-title i {
-            color: var(--primary);
+            color: var(--copper-terracotta);
             font-size: 16px;
         }
 
@@ -219,40 +268,42 @@
             width: 100%;
             height: 440px;
             border-radius: var(--radius-md);
-            z-index: 1;
             border: 1px solid var(--border-color);
+            background: #181B1E;
+        }
+
+        /* Map Controls Header */
+        .map-quick-buttons {
+            display: flex;
+            gap: 8px;
         }
 
         /* Metrics Row */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
+            gap: 12px;
             margin-bottom: 16px;
         }
 
         .metric-card {
-            background: rgba(31, 41, 55, 0.5);
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 14px 16px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
             gap: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .metric-card:hover {
-            border-color: var(--border-highlight);
-            transform: translateY(-2px);
         }
 
         .metric-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .metric-value {
@@ -266,43 +317,36 @@
             color: var(--text-dim);
         }
 
-        /* Risk Band Badges */
+        /* Risk Status Badges */
         .risk-badge {
             padding: 3px 8px;
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
         }
 
-        .risk-low { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .risk-medium { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .risk-high { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .risk-low { background: rgba(140, 179, 153, 0.2); color: var(--pastel-sage); }
+        .risk-medium { background: rgba(229, 178, 125, 0.2); color: var(--pastel-amber); }
+        .risk-high { background: rgba(224, 122, 95, 0.2); color: var(--pastel-rust); }
 
         /* Chart Box */
         .chart-box {
             position: relative;
-            height: 300px;
+            height: 290px;
             width: 100%;
         }
 
-        /* Right Side: Scenario Controls & Risk Drivers */
-        .right-column {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Controls Panel */
+        /* Controls & Sliders */
         .control-group {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 16px;
-            background: rgba(31, 41, 55, 0.4);
-            padding: 16px;
+            gap: 10px;
+            background: var(--bg-surface);
+            padding: 14px 16px;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
+            margin-bottom: 12px;
         }
 
         .control-header {
@@ -315,19 +359,22 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .control-value-display {
             font-size: 14px;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--pastel-amber);
         }
 
         .slider-input {
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: #374151;
+            background: #353C45;
             outline: none;
             -webkit-appearance: none;
             cursor: pointer;
@@ -338,26 +385,25 @@
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary);
+            background: var(--copper-terracotta);
+            box-shadow: 0 0 8px rgba(217, 130, 91, 0.5);
             cursor: pointer;
-            transition: transform 0.1s;
         }
 
         .slider-input::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
+            transform: scale(1.15);
         }
 
-        /* Scenario Comparison Card */
+        /* Scenario Comparison Box */
         .scenario-results-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 8px;
         }
 
         .scenario-box {
-            background: rgba(17, 24, 39, 0.6);
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
             padding: 12px;
             border-radius: var(--radius-md);
@@ -365,17 +411,17 @@
         }
 
         .scenario-box.highlight {
-            border-color: var(--primary);
-            background: rgba(56, 189, 248, 0.08);
+            border-color: var(--copper-terracotta);
+            background: rgba(217, 130, 91, 0.08);
         }
 
         .scenario-box .val {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 700;
             margin-top: 4px;
         }
 
-        /* Feature Importance Bar */
+        /* Feature Importance List */
         .feature-bar-list {
             display: flex;
             flex-direction: column;
@@ -396,21 +442,21 @@
 
         .progress-track {
             height: 6px;
-            background: #374151;
+            background: #353C45;
             border-radius: 3px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #38bdf8, #6366f1);
+            background: linear-gradient(90deg, var(--copper-terracotta), var(--pastel-amber));
             border-radius: 3px;
         }
 
-        /* Recommendation Box */
+        /* Recommendation Banner */
         .recommendation-box {
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: rgba(140, 179, 153, 0.1);
+            border: 1px solid rgba(140, 179, 153, 0.3);
             border-radius: var(--radius-md);
             padding: 14px;
             display: flex;
@@ -419,15 +465,15 @@
         }
 
         .recommendation-box i {
-            color: #10b981;
-            font-size: 18px;
+            color: var(--pastel-sage);
+            font-size: 16px;
             margin-top: 2px;
         }
 
         .recommendation-text h4 {
             font-size: 13px;
-            color: #34d399;
-            margin-bottom: 4px;
+            color: var(--pastel-sage);
+            margin-bottom: 3px;
         }
 
         .recommendation-text p {
@@ -436,12 +482,12 @@
             line-height: 1.4;
         }
 
-        /* Buttons & Tab Controls */
+        /* Buttons */
         .btn {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 8px 14px;
+            padding: 7px 12px;
             border-radius: var(--radius-md);
             font-size: 12px;
             font-weight: 600;
@@ -453,27 +499,16 @@
         }
 
         .btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #0284c7, #4f46e5);
-            border: none;
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            box-shadow: var(--shadow-glow);
+            border-color: var(--copper-terracotta);
+            color: var(--copper-terracotta);
         }
 
         /* Modal styling */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(9, 13, 22, 0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(20, 23, 26, 0.85);
+            backdrop-filter: blur(6px);
             z-index: 2000;
             display: none;
             align-items: center;
@@ -486,7 +521,7 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 800px;
+            max-width: 780px;
             max-height: 85vh;
             overflow-y: auto;
             padding: 24px;
@@ -498,19 +533,18 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 16px;
-            margin-bottom: 20px;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
         }
 
-        /* Custom Leaflet Popup Styling */
+        /* Leaflet Popups */
         .leaflet-popup-content-wrapper {
-            background: rgba(17, 24, 39, 0.95) !important;
-            color: #fff !important;
-            border: 1px solid #374151;
-            border-radius: 10px;
-            backdrop-filter: blur(8px);
+            background: #252A30 !important;
+            color: #F4F1DE !important;
+            border: 1px solid #353C45;
+            border-radius: 8px;
         }
-        .leaflet-popup-tip { background: rgba(17, 24, 39, 0.95) !important; }
+        .leaflet-popup-tip { background: #252A30 !important; }
     </style>
 </head>
 <body>
@@ -518,10 +552,10 @@
     <!-- Header Navigation -->
     <nav class="navbar">
         <div class="brand">
-            <div class="brand-icon"><i class="fa-solid fa-mountain-sun"></i></div>
+            <div class="brand-icon"><i class="fa-solid fa-gem"></i></div>
             <div class="brand-text">
                 <h1>MinePulse</h1>
-                <span>SIH26009 Manganese Planning Prototype</span>
+                <span>SIH26009 Manganese Reserve & Shortfall System</span>
             </div>
         </div>
 
@@ -533,52 +567,59 @@
                 </select>
             </div>
 
-            <div class="nav-badges">
-                <span class="badge badge-public"><i class="fa-solid fa-earth-asia"></i> Public Reference</span>
-                <span class="badge badge-official"><i class="fa-solid fa-file-contract"></i> Official Reported</span>
-                <span class="badge badge-simulated"><i class="fa-solid fa-chart-line"></i> Simulated Ops</span>
+            <!-- Interactive Layer Filter Buttons -->
+            <div class="filter-pills">
+                <div class="pill-btn pill-heat active" id="btn-toggle-heat" onclick="toggleDataCategory('heat')">
+                    <i class="fa-solid fa-fire"></i> India Heatmap
+                </div>
+                <div class="pill-btn pill-public active" id="btn-toggle-public" onclick="toggleDataCategory('public')">
+                    <i class="fa-solid fa-earth-asia"></i> Public Context
+                </div>
+                <div class="pill-btn pill-official active" id="btn-toggle-official" onclick="toggleDataCategory('official')">
+                    <i class="fa-solid fa-file-contract"></i> Official Reported
+                </div>
+                <div class="pill-btn pill-simulated active" id="btn-toggle-simulated" onclick="toggleDataCategory('simulated')">
+                    <i class="fa-solid fa-chart-line"></i> Simulated Ops
+                </div>
             </div>
 
             <button class="btn" onclick="toggleModal('provenance-modal')">
-                <i class="fa-solid fa-circle-info"></i> Data Sources & Methods
-            </button>
-            <button class="btn btn-primary" onclick="toggleModal('script-modal')">
-                <i class="fa-solid fa-person-chalkboard"></i> Demo Script
+                <i class="fa-solid fa-circle-info"></i> Data Provenance & Methods
             </button>
         </div>
     </nav>
 
-    <!-- Main Dashboard Body -->
+    <!-- Main App Layout -->
     <div class="app-container">
 
         <!-- Left Column: Map & Production Forecast Timeline -->
         <div class="left-column">
             
-            <!-- Map Card -->
-            <div class="card">
+            <!-- Map Panel -->
+            <div class="card" id="card-map">
                 <div class="card-header">
                     <div class="card-title">
                         <i class="fa-solid fa-map-location-dot"></i>
-                        <span>Multimodal Geospatial Context Map</span>
+                        <span>Multimodal Geospatial Map & All-India Manganese Occurrence Density</span>
                     </div>
-                    <div style="font-size: 12px; color: var(--text-muted);">
-                        Center: <b style="color:#f8fafc">21.5317° N, 79.7044° E</b> | Bhandara Belt
+                    
+                    <div class="map-quick-buttons">
+                        <button class="btn" onclick="viewAllIndia()"><i class="fa-solid fa-expand"></i> India Heatmap View</button>
+                        <button class="btn" onclick="viewDongriMine()"><i class="fa-solid fa-crosshairs"></i> Dongri Mine View</button>
                     </div>
                 </div>
                 
                 <div id="map"></div>
             </div>
 
-            <!-- Historical & Forecast Production Panel -->
-            <div class="card">
+            <!-- Production Timeline Panel -->
+            <div class="card" id="card-timeline">
                 <div class="card-header">
                     <div class="card-title">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <span>Production Outlook & One-Week-Ahead Shortfall Forecast</span>
+                        <i class="fa-solid fa-chart-area"></i>
+                        <span>Weekly Production Output & Shortfall Forecast</span>
                     </div>
-                    <div>
-                        <span class="badge badge-simulated">Chronological Holdout Split (80/20)</span>
-                    </div>
+                    <span class="pill-btn pill-simulated" style="cursor:default">Chronological Holdout (80/20)</span>
                 </div>
 
                 <!-- KPI Metric Cards -->
@@ -586,29 +627,29 @@
                     <div class="metric-card">
                         <div class="metric-label">Planned Target <i class="fa-solid fa-bullseye"></i></div>
                         <div class="metric-value" id="kpi-target">1,000 t</div>
-                        <div class="metric-subtext">Weekly output target</div>
+                        <div class="metric-subtext">Weekly production plan</div>
                     </div>
 
                     <div class="metric-card">
                         <div class="metric-label">RF ML Forecast <i class="fa-solid fa-robot"></i></div>
-                        <div class="metric-value" id="kpi-forecast" style="color: #38bdf8;">912 t</div>
+                        <div class="metric-value" id="kpi-forecast" style="color: var(--copper-terracotta);">912 t</div>
                         <div class="metric-subtext">Random Forest prediction</div>
                     </div>
 
                     <div class="metric-card">
                         <div class="metric-label">Shortfall Gap <i class="fa-solid fa-triangle-exclamation"></i></div>
-                        <div class="metric-value" id="kpi-gap" style="color: #f87171;">88 t</div>
+                        <div class="metric-value" id="kpi-gap" style="color: var(--pastel-rust);">88 t</div>
                         <div class="metric-subtext"><span id="kpi-risk-badge" class="risk-badge risk-high">HIGH RISK (8.8%)</span></div>
                     </div>
 
                     <div class="metric-card">
                         <div class="metric-label">Holdout MAE <i class="fa-solid fa-scale-balanced"></i></div>
-                        <div class="metric-value" style="color: #34d399;">25.89 t</div>
-                        <div class="metric-subtext">vs Baseline MAE: 36.16 t</div>
+                        <div class="metric-value" style="color: var(--pastel-sage);">25.89 t</div>
+                        <div class="metric-subtext">Baseline MAE: 36.16 t</div>
                     </div>
                 </div>
 
-                <!-- Chart container -->
+                <!-- Forecast Chart -->
                 <div class="chart-box">
                     <canvas id="productionChart"></canvas>
                 </div>
@@ -616,39 +657,39 @@
 
         </div>
 
-        <!-- Right Column: Interactive What-If Scenario Simulator & Risk Drivers -->
+        <!-- Right Column: Interactive What-If Scenario Controls & Risk Drivers -->
         <div class="right-column">
             
-            <!-- What-If Control Panel -->
-            <div class="card">
+            <!-- What-If Controls -->
+            <div class="card" id="card-scenarios">
                 <div class="card-header">
                     <div class="card-title">
                         <i class="fa-solid fa-sliders"></i>
-                        <span>Operational "What-If?" Scenario Control</span>
+                        <span>Operational "What-If?" Scenario Controls</span>
                     </div>
                 </div>
 
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
-                    Adjust operational levers to observe live re-forecast predictions and recovered tonnes under prototype rule assumptions.
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+                    Move operational levers below to observe live re-forecast predictions and recovered tonnes under prototype rule assumptions.
                 </p>
 
-                <!-- Slider 1: Equipment Availability / Downtime -->
+                <!-- Slider 1: Downtime -->
                 <div class="control-group">
                     <div class="control-header">
-                        <span class="control-title"><i class="fa-solid fa-truck-monster" style="color:#38bdf8"></i> Downtime Reduction</span>
+                        <span class="control-title"><i class="fa-solid fa-truck-monster" style="color:var(--copper-terracotta)"></i> Equipment Downtime</span>
                         <span class="control-value-display" id="val-downtime">8.0 hrs</span>
                     </div>
                     <input type="range" class="slider-input" id="slider-downtime" min="0" max="24" step="0.5" value="8">
                     <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
-                        <span>0 hrs (Max Uptime)</span>
-                        <span>24 hrs (Outage)</span>
+                        <span>0 hrs (High Uptime)</span>
+                        <span>24 hrs (Full Outage)</span>
                     </div>
                 </div>
 
                 <!-- Slider 2: Blasting Delay -->
                 <div class="control-group">
                     <div class="control-header">
-                        <span class="control-title"><i class="fa-solid fa-explosion" style="color:#f59e0b"></i> Blasting Delay</span>
+                        <span class="control-title"><i class="fa-solid fa-burst" style="color:var(--pastel-amber)"></i> Blasting Delay</span>
                         <span class="control-value-display" id="val-blast">2.0 hrs</span>
                     </div>
                     <input type="range" class="slider-input" id="slider-blast" min="0" max="12" step="0.5" value="2">
@@ -658,52 +699,51 @@
                     </div>
                 </div>
 
-                <!-- Live Scenario Output Card -->
-                <div style="margin-top: 6px;">
-                    <div style="font-size: 13px; font-weight:600; margin-bottom: 8px;">Scenario Impact Comparison</div>
+                <!-- Scenario Impact Box -->
+                <div style="margin-top: 4px;">
+                    <div style="font-size: 12px; font-weight:600; color:var(--text-muted); margin-bottom: 6px;">Live Scenario Forecast Impact</div>
                     
                     <div class="scenario-results-grid">
                         <div class="scenario-box">
                             <div style="font-size: 11px; color: var(--text-muted);">Base RF Forecast</div>
-                            <div class="val" id="scen-base-val" style="color:#9ca3af;">912.0 t</div>
+                            <div class="val" id="scen-base-val" style="color:var(--text-muted);">912.0 t</div>
                         </div>
 
                         <div class="scenario-box highlight">
-                            <div style="font-size: 11px; color: #38bdf8;">Scenario Forecast</div>
-                            <div class="val" id="scen-new-val" style="color:#38bdf8;">912.0 t</div>
+                            <div style="font-size: 11px; color: var(--copper-terracotta);">Scenario Forecast</div>
+                            <div class="val" id="scen-new-val" style="color:var(--pastel-amber);">912.0 t</div>
                         </div>
                     </div>
 
-                    <div style="margin-top: 10px; background: rgba(56, 189, 248, 0.1); border: 1px dashed rgba(56, 189, 248, 0.4); padding: 10px; border-radius: 8px; text-align: center;">
+                    <div style="margin-top: 10px; background: rgba(140, 179, 153, 0.1); border: 1px dashed rgba(140, 179, 153, 0.4); padding: 10px; border-radius: 8px; text-align: center;">
                         <span style="font-size: 12px; color: var(--text-muted);">Shortfall Recovered: </span>
-                        <b id="scen-recovered" style="font-size: 15px; color: #34d399;">+0.0 tonnes</b>
+                        <b id="scen-recovered" style="font-size: 15px; color: var(--pastel-sage);">+0.0 tonnes</b>
                     </div>
                 </div>
 
-                <!-- Recommendation box -->
-                <div class="recommendation-box" style="margin-top: 16px;">
+                <!-- Recommendation banner -->
+                <div class="recommendation-box" style="margin-top: 14px;">
                     <i class="fa-solid fa-lightbulb"></i>
                     <div class="recommendation-text">
                         <h4>Recommended Operational Action</h4>
-                        <p id="rec-text">Select scenario parameters above to evaluate mitigation steps.</p>
+                        <p id="rec-text">Adjust sliders to calculate recovery strategies.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Model Risk Factor Contributors -->
+            <!-- Risk Factor Drivers -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span>Model Feature Importance Drivers</span>
                     </div>
-                    <span style="font-size:10px; color:var(--text-dim);">Descriptive (RF)</span>
                 </div>
 
                 <div class="feature-bar-list">
                     <div class="feature-item">
                         <div class="feature-info">
-                            <span><i class="fa-solid fa-cloud-showers-heavy" style="color:#38bdf8"></i> Prior Week Rainfall</span>
+                            <span><i class="fa-solid fa-cloud-showers-heavy" style="color:var(--copper-terracotta)"></i> Prior Week Rainfall</span>
                             <b>42.6%</b>
                         </div>
                         <div class="progress-track"><div class="progress-fill" style="width: 42.6%;"></div></div>
@@ -711,7 +751,7 @@
 
                     <div class="feature-item">
                         <div class="feature-info">
-                            <span><i class="fa-solid fa-bullseye" style="color:#818cf8"></i> Planned Tonnes Target</span>
+                            <span><i class="fa-solid fa-bullseye" style="color:var(--pastel-amber)"></i> Planned Target Tonnes</span>
                             <b>22.2%</b>
                         </div>
                         <div class="progress-track"><div class="progress-fill" style="width: 22.2%;"></div></div>
@@ -719,7 +759,7 @@
 
                     <div class="feature-item">
                         <div class="feature-info">
-                            <span><i class="fa-solid fa-explosion" style="color:#f59e0b"></i> Blast Delay Hours</span>
+                            <span><i class="fa-solid fa-burst" style="color:var(--pastel-rust)"></i> Blast Delay Hours</span>
                             <b>16.5%</b>
                         </div>
                         <div class="progress-track"><div class="progress-fill" style="width: 16.5%;"></div></div>
@@ -727,15 +767,15 @@
 
                     <div class="feature-item">
                         <div class="feature-info">
-                            <span><i class="fa-solid fa-screwdriver-wrench" style="color:#10b981"></i> Equipment Downtime</span>
+                            <span><i class="fa-solid fa-screwdriver-wrench" style="color:var(--pastel-sage)"></i> Equipment Downtime</span>
                             <b>6.5%</b>
                         </div>
                         <div class="progress-track"><div class="progress-fill" style="width: 6.5%;"></div></div>
                     </div>
                 </div>
 
-                <div style="font-size: 11px; color: var(--text-dim); margin-top: 14px; border-top: 1px solid var(--border-color); padding-top: 10px;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Model feature importance scores describe statistical associations in simulated records; they do not represent proven causal laws.
+                <div style="font-size: 11px; color: var(--text-dim); margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                    <i class="fa-solid fa-circle-info"></i> Feature importance values reflect statistical associations in simulated training records.
                 </div>
             </div>
 
@@ -743,11 +783,11 @@
 
     </div>
 
-    <!-- Modal 1: Provenance & Data Sources -->
+    <!-- Data Provenance Modal -->
     <div class="modal-overlay" id="provenance-modal">
         <div class="modal-card">
             <div class="modal-header">
-                <h3><i class="fa-solid fa-database" style="color:var(--primary)"></i> Data Sources & Provenance Metadata</h3>
+                <h3><i class="fa-solid fa-database" style="color:var(--copper-terracotta)"></i> Data Provenance & Methods Metadata</h3>
                 <button class="btn" onclick="toggleModal('provenance-modal')"><i class="fa-solid fa-xmark"></i> Close</button>
             </div>
             
@@ -757,8 +797,8 @@
 
             <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
                 <thead>
-                    <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--primary);">
-                        <th style="padding: 8px;">Dataset Name</th>
+                    <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--pastel-amber);">
+                        <th style="padding: 8px;">Dataset</th>
                         <th style="padding: 8px;">Source</th>
                         <th style="padding: 8px;">Resolution / Date</th>
                         <th style="padding: 8px;">Status Tag</th>
@@ -769,57 +809,38 @@
                         <td style="padding: 8px;"><b>GSI Manganese Deposits</b></td>
                         <td style="padding: 8px;">Open Government Data Platform India (GSI)</td>
                         <td style="padding: 8px;">32 national occurrence points (2014)</td>
-                        <td style="padding: 8px;"><span class="badge badge-public">Public Reference</span></td>
+                        <td style="padding: 8px;"><span class="pill-btn pill-public" style="cursor:default">Public Reference</span></td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--border-color);">
                         <td style="padding: 8px;"><b>IBM Minerals Yearbook</b></td>
                         <td style="padding: 8px;">Indian Bureau of Mines (2024 Report, p.66)</td>
                         <td style="padding: 8px;">14.58M Tonnes UNFC Dongri Buzurg</td>
-                        <td style="padding: 8px;"><span class="badge badge-official">Official Reported</span></td>
+                        <td style="padding: 8px;"><span class="pill-btn pill-official" style="cursor:default">Official Reported</span></td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--border-color);">
-                        <td style="padding: 8px;"><b>Sentinel-2 Satellite Surface Context</b></td>
+                        <td style="padding: 8px;"><b>Sentinel-2 Surface Context</b></td>
                         <td style="padding: 8px;">ESA Copernicus Sentinel-2A L2A</td>
                         <td style="padding: 8px;">10m resolution (Sensing: 2024-03-15, 1.2% cloud)</td>
-                        <td style="padding: 8px;"><span class="badge badge-public">Public Reference</span></td>
+                        <td style="padding: 8px;"><span class="pill-btn pill-public" style="cursor:default">Public Reference</span></td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--border-color);">
                         <td style="padding: 8px;"><b>NASA POWER Daily Rain</b></td>
                         <td style="padding: 8px;">NASA Agroclimatology API</td>
                         <td style="padding: 8px;">0.5° regional grid (1,461 daily rows, 2021-2024)</td>
-                        <td style="padding: 8px;"><span class="badge badge-public">Public Reference</span></td>
+                        <td style="padding: 8px;"><span class="pill-btn pill-public" style="cursor:default">Public Reference</span></td>
                     </tr>
                     <tr style="border-bottom: 1px solid var(--border-color);">
                         <td style="padding: 8px;"><b>Simulated Operations History</b></td>
                         <td style="padding: 8px;">Synthetic operational logging rules</td>
                         <td style="padding: 8px;">208 weekly operating rows (Seed: 26009)</td>
-                        <td style="padding: 8px;"><span class="badge badge-simulated">Simulated Data</span></td>
+                        <td style="padding: 8px;"><span class="pill-btn pill-simulated" style="cursor:default">Simulated Ops</span></td>
                     </tr>
                 </tbody>
             </table>
 
-            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 12px; border-radius: 8px; font-size: 12px; color: #f87171;">
-                <b>Optical Satellite Limitation Disclaimer:</b> Optical surface reflectance imagery observes terrain features and excavation footprints. It does not penetrate subsurface strata to directly measure underground manganese reserve tonnage or grade. Detailed drill-hole and assay records from MOIL are required for operational validation.
+            <div style="background: rgba(224, 122, 95, 0.1); border: 1px solid rgba(224, 122, 95, 0.3); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--pastel-rust);">
+                <b>Optical Satellite Limitation Disclaimer:</b> Optical surface reflectance imagery observes terrain features and excavation footprints. It does not penetrate subsurface strata to directly measure underground manganese reserve tonnage or grade.
             </div>
-        </div>
-    </div>
-
-    <!-- Modal 2: 3-Minute Presentation Demo Script -->
-    <div class="modal-overlay" id="script-modal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3><i class="fa-solid fa-person-chalkboard" style="color:var(--primary)"></i> 3-Minute Presentation Demo Script</h3>
-                <button class="btn" onclick="toggleModal('script-modal')"><i class="fa-solid fa-xmark"></i> Close</button>
-            </div>
-            
-            <ol style="font-size: 13px; color: var(--text-main); padding-left: 20px; display: flex; flex-direction: column; gap: 14px;">
-                <li><b>The Problem Statement (20s):</b> "Manganese mine planning faces production shortfalls caused by weather and equipment constraints. We built <i>MinePulse</i> to connect spatial context with predictive shortfall planning."</li>
-                <li><b>Geospatial Map Context (35s):</b> "We select Dongri Buzurg mine in Bhandara, Maharashtra. Here we see public GSI manganese occurrence points, the IBM Yearbook official reserve report (14.58M tonnes), and the Sentinel-2 cloud-free surface context layer."</li>
-                <li><b>Data Transparency Disclosures (15s):</b> "Public geological and weather layers are real. Mine-level daily operations logs are proprietary, so operational rows are synthetically generated and explicitly labeled SIMULATED."</li>
-                <li><b>Shortfall Machine Learning Forecast (45s):</b> "Comparing our target vs. actual history, the Random Forest model achieves a holdout MAE of 25.89 tonnes versus 36.16 tonnes for the trailing moving-average baseline."</li>
-                <li><b>What-If Action Scenario (40s):</b> "By adjusting equipment downtime or blasting delays on the slider controls, the app dynamically re-estimates shortfall recovery in real-time."</li>
-                <li><b>Limitations & Roadmap (25s):</b> "Optical satellite data provides surface context, not subsurface ore tonnage. Validating this for MOIL deployment requires approved drill-hole and assay ground truth."</li>
-            </ol>
         </div>
     </div>
 
@@ -828,122 +849,208 @@
         let map, chart;
         let masterData = window.MINEPULSE_DATA;
 
+        let categoryState = {
+            heat: true,
+            public: true,
+            official: true,
+            simulated: true
+        };
+
+        let heatLayerGroup, sentinelLayerGroup, gsiLayerGroup, dongriMarkerGroup;
+
         // Toggle Modal
         function toggleModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        // Initialize Map
+        // View Control Functions
+        function viewAllIndia() {
+            if (map) {
+                map.flyTo([20.5937, 78.9629], 5, { duration: 1.5 });
+            }
+        }
+
+        function viewDongriMine() {
+            if (map) {
+                map.flyTo([21.5317, 79.7044], 13, { duration: 1.5 });
+            }
+        }
+
+        // Interactive Filter Pills
+        function toggleDataCategory(category) {
+            categoryState[category] = !categoryState[category];
+            const btn = document.getElementById('btn-toggle-' + category);
+            
+            if (categoryState[category]) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+
+            if (category === 'heat') {
+                if (categoryState.heat) {
+                    map.addLayer(heatLayerGroup);
+                } else {
+                    map.removeLayer(heatLayerGroup);
+                }
+            }
+
+            if (category === 'public') {
+                if (categoryState.public) {
+                    map.addLayer(sentinelLayerGroup);
+                    map.addLayer(gsiLayerGroup);
+                } else {
+                    map.removeLayer(sentinelLayerGroup);
+                    map.removeLayer(gsiLayerGroup);
+                }
+            }
+
+            if (category === 'official') {
+                if (categoryState.official) {
+                    map.addLayer(dongriMarkerGroup);
+                } else {
+                    map.removeLayer(dongriMarkerGroup);
+                }
+            }
+
+            if (category === 'simulated') {
+                const cardTimeline = document.getElementById('card-timeline');
+                const cardScenarios = document.getElementById('card-scenarios');
+                if (categoryState.simulated) {
+                    cardTimeline.style.opacity = '1';
+                    cardScenarios.style.opacity = '1';
+                } else {
+                    cardTimeline.style.opacity = '0.3';
+                    cardScenarios.style.opacity = '0.3';
+                }
+            }
+        }
+
+        // Initialize Map with All-India Heatmap + Mine Detail
         function initMap() {
             const centerLat = 21.5317;
             const centerLon = 79.7044;
 
             map = L.map('map').setView([centerLat, centerLon], 13);
 
-            // Tile layers
+            // Tiles
             const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 maxZoom: 18,
-                attribution: 'Esri World Imagery &copy; Esri, Earthstar Geographics'
-            });
-
-            const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap &copy; CARTO'
+                attribution: 'Esri World Imagery'
             }).addTo(map);
 
             const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             });
 
-            // 1. Sentinel-2 Context Polygon Overlay
-            const sentinelGeojson = masterData.sentinel_geojson;
-            const sentinelLayer = L.geoJSON(sentinelGeojson, {
-                style: function(feature) {
-                    if (feature.geometry.type === "Polygon") {
-                        return { color: "#38bdf8", weight: 2, fillOpacity: 0.15, dashArray: "5, 5" };
+            heatLayerGroup = L.layerGroup().addTo(map);
+            sentinelLayerGroup = L.layerGroup().addTo(map);
+            gsiLayerGroup = L.layerGroup().addTo(map);
+            dongriMarkerGroup = L.layerGroup().addTo(map);
+
+            // 1. India-Wide Manganese Deposit Density Heatmap Layer
+            if (masterData && masterData.gsi_geojson && masterData.gsi_geojson.features) {
+                const heatPoints = masterData.gsi_geojson.features.map(f => {
+                    const coords = f.geometry.coordinates;
+                    return [coords[1], coords[0], 0.8]; // lat, lon, intensity
+                });
+
+                if (L.heatLayer) {
+                    const heat = L.heatLayer(heatPoints, {
+                        radius: 30,
+                        blur: 20,
+                        maxZoom: 10,
+                        gradient: { 0.2: '#8CB399', 0.5: '#E5B27D', 0.8: '#D9825B', 1.0: '#E07A5F' }
+                    });
+                    heat.addTo(heatLayerGroup);
+                }
+            }
+
+            // 2. Sentinel-2 Polygon Overlay
+            if (masterData && masterData.sentinel_geojson) {
+                L.geoJSON(masterData.sentinel_geojson, {
+                    style: { color: "#D9825B", weight: 2, fillOpacity: 0.15, dashArray: "4, 4" },
+                    onEachFeature: function(feature, layer) {
+                        if (feature.properties && feature.properties.name) {
+                            layer.bindPopup(`
+                                <div style="font-size:12px;">
+                                    <b style="color:#D9825B">${feature.properties.name}</b><br>
+                                    <b>Sensor:</b> ${feature.properties.sensor}<br>
+                                    <b>Date:</b> ${feature.properties.acquisition_date}<br>
+                                    <b>Cloud Cover:</b> ${feature.properties.cloud_cover_pct}%<br>
+                                    <b>Resolution:</b> 10m / pixel<br>
+                                    <span class="pill-btn pill-public" style="margin-top:6px; font-size:9px;">Public Context</span>
+                                </div>
+                            `);
+                        }
                     }
-                },
-                onEachFeature: function(feature, layer) {
-                    if (feature.properties && feature.properties.name) {
+                }).addTo(sentinelLayerGroup);
+            }
+
+            // 3. GSI Manganese Deposits Markers
+            if (masterData && masterData.gsi_geojson) {
+                L.geoJSON(masterData.gsi_geojson, {
+                    pointToLayer: function (feature, latlng) {
+                        return L.circleMarker(latlng, {
+                            radius: 6,
+                            fillColor: "#E5B27D",
+                            color: "#14171A",
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.85
+                        });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        const props = feature.properties;
                         layer.bindPopup(`
-                            <div style="font-size:12px;">
-                                <b style="color:#38bdf8">${feature.properties.name}</b><br>
-                                <b>Sensor:</b> ${feature.properties.sensor}<br>
-                                <b>Date:</b> ${feature.properties.acquisition_date}<br>
-                                <b>Cloud Cover:</b> ${feature.properties.cloud_cover_pct}%<br>
-                                <b>Resolution:</b> 10m / pixel<br>
-                                <span class="badge badge-public" style="margin-top:5px;">Public Reference</span>
+                            <div style="font-size:12px; line-height:1.4;">
+                                <b style="color:#E5B27D;">${props.locality || 'Manganese Occurrence'}</b> (${props.statename || ''})<br>
+                                <b>Metallogenesis:</b> ${props.metallogenesis || 'N/A'}<br>
+                                <b>Host Rock:</b> ${props.hostrock || 'N/A'}<br>
+                                <b>Formation:</b> ${props.formation || 'N/A'}<br>
+                                <span class="pill-btn pill-public" style="margin-top:6px; font-size:9px;">GSI Documented Occurrence (2014)</span>
                             </div>
                         `);
                     }
-                }
-            }).addTo(map);
+                }).addTo(gsiLayerGroup);
+            }
 
-            // 2. GSI Manganese Deposits Markers Layer
-            const gsiGeojson = masterData.gsi_geojson;
-            const gsiLayer = L.geoJSON(gsiGeojson, {
-                pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng, {
-                        radius: 6,
-                        fillColor: "#f59e0b",
-                        color: "#fff",
-                        weight: 1,
-                        opacity: 1,
-                        fillOpacity: 0.8
-                    });
-                },
-                onEachFeature: function (feature, layer) {
-                    const props = feature.properties;
-                    layer.bindPopup(`
-                        <div style="font-size:12px; line-height:1.5;">
-                            <b style="color:#f59e0b;">${props.locality || 'Manganese Occurrence'}</b> (${props.statename || ''})<br>
-                            <b>Metallogenesis:</b> ${props.metallogenesis || 'N/A'}<br>
-                            <b>Host Rock:</b> ${props.hostrock || 'N/A'}<br>
-                            <b>Formation:</b> ${props.formation || 'N/A'}<br>
-                            <b>Coordinates:</b> ${props.latdd?.toFixed(4)}° N, ${props.londd?.toFixed(4)}° E<br>
-                            <span class="badge badge-public" style="margin-top:6px;">GSI Documented Occurrence (2014)</span>
-                        </div>
-                    `);
-                }
-            }).addTo(map);
-
-            // 3. Dongri Buzurg Mine Center Pin (IBM Reserve Figure)
-            const dongriMarker = L.marker([centerLat, centerLon]).addTo(map);
+            // 4. Dongri Buzurg Mine Center Pin
+            const dongriMarker = L.marker([centerLat, centerLon]).addTo(dongriMarkerGroup);
             dongriMarker.bindPopup(`
                 <div style="font-size:12px; width: 220px;">
-                    <b style="color:#38bdf8; font-size:14px;">Dongri Buzurg Mine (MOIL)</b><br>
-                    <span style="color:#9ca3af;">Bhandara District, Maharashtra</span><br>
-                    <hr style="border-color:#374151; margin:6px 0;">
+                    <b style="color:#D9825B; font-size:14px;">Dongri Buzurg Mine (MOIL)</b><br>
+                    <span style="color:#A3B1B6;">Bhandara District, Maharashtra</span><br>
+                    <hr style="border-color:#353C45; margin:6px 0;">
                     <b>Reported IBM Reserves (2024):</b><br>
-                    • UNFC 111 (Proved): 2,986,230 t<br>
-                    • UNFC 211 (Probable): 5,142,700 t<br>
-                    • UNFC 222 (Feasibility): 2,942,757 t<br>
-                    <b style="color:#34d399;">Total Reported: 14,583,826 Tonnes</b><br>
-                    <span class="badge badge-official" style="margin-top:6px;">IBM Yearbook 2024 (p.66)</span>
+                    • Proved (111): 2,986,230 t<br>
+                    • Probable (211): 5,142,700 t<br>
+                    • Feasibility (222): 2,942,757 t<br>
+                    <b style="color:#8CB399;">Total Reported: 14,583,826 Tonnes</b><br>
+                    <span class="pill-btn pill-official" style="margin-top:6px; font-size:9px;">IBM Yearbook 2024 (p.66)</span>
                 </div>
             `).openPopup();
 
-            // Layer Controls
             L.control.layers(
-                { "Carto Dark": cartoDark, "Esri Satellite": esriSat, "OpenStreetMap": osm },
-                { "Sentinel-2 Context Box": sentinelLayer, "GSI Deposits (32 Points)": gsiLayer }
+                { "Satellite Imagery": esriSat, "OpenStreetMap": osm },
+                { "India Manganese Heatmap": heatLayerGroup, "GSI Deposits (32 Markers)": gsiLayerGroup, "Sentinel-2 Context Box": sentinelLayerGroup }
             ).addTo(map);
+
+            setTimeout(() => { map.invalidateSize(); }, 300);
         }
 
-        // Initialize Forecast Timeline Chart
+        // Initialize Forecast Chart
         function initChart() {
             const ctx = document.getElementById('productionChart').getContext('2d');
-            const opsData = masterData.simulated_ops;
+            const opsData = masterData ? masterData.simulated_ops : [];
+            const fcResults = masterData ? masterData.forecast_results : [];
             
-            // Extract recent 30 weeks for clean display
-            const recentOps = opsData.slice(-30);
+            const recentOps = opsData.slice(-25);
             const labels = recentOps.map(r => r.week_start);
             const planned = recentOps.map(r => parseFloat(r.planned_tonnes));
             const actual = recentOps.map(r => parseFloat(r.actual_tonnes));
             
-            // Forecast results
-            const fcResults = masterData.forecast_results;
             const fcMap = {};
             fcResults.forEach(r => {
                 fcMap[r.week_start] = {
@@ -963,8 +1070,8 @@
                         {
                             label: 'Planned Target (t)',
                             data: planned,
-                            borderColor: '#9ca3af',
-                            borderDash: [5, 5],
+                            borderColor: '#A3B1B6',
+                            borderDash: [4, 4],
                             borderWidth: 2,
                             pointRadius: 0,
                             fill: false
@@ -972,8 +1079,8 @@
                         {
                             label: 'Simulated Actual Output (t)',
                             data: actual,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: '#8CB399',
+                            backgroundColor: 'rgba(140, 179, 153, 0.1)',
                             borderWidth: 2,
                             pointRadius: 3,
                             fill: true
@@ -981,7 +1088,7 @@
                         {
                             label: 'Trailing Avg Baseline (t)',
                             data: baselineFc,
-                            borderColor: '#f59e0b',
+                            borderColor: '#E5B27D',
                             borderWidth: 2,
                             pointRadius: 3,
                             fill: false
@@ -989,8 +1096,8 @@
                         {
                             label: 'Random Forest ML Forecast (t)',
                             data: rfFc,
-                            borderColor: '#38bdf8',
-                            backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                            borderColor: '#D9825B',
+                            backgroundColor: 'rgba(217, 130, 91, 0.15)',
                             borderWidth: 3,
                             pointRadius: 4,
                             fill: false
@@ -1002,32 +1109,32 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            labels: { color: '#cbd5e1', font: { family: 'Outfit', size: 12 } }
+                            labels: { color: '#F4F1DE', font: { family: 'Plus Jakarta Sans', size: 11 } }
                         }
                     },
                     scales: {
                         x: {
-                            ticks: { color: '#6b7280', font: { family: 'Outfit', size: 11 } },
-                            grid: { color: '#1f2937' }
+                            ticks: { color: '#717D83', font: { family: 'Plus Jakarta Sans', size: 10 } },
+                            grid: { color: '#2A2F35' }
                         },
                         y: {
-                            ticks: { color: '#6b7280', font: { family: 'Outfit', size: 11 } },
-                            grid: { color: '#1f2937' },
-                            title: { display: true, text: 'Tonnes / Week', color: '#9ca3af' }
+                            ticks: { color: '#717D83', font: { family: 'Plus Jakarta Sans', size: 10 } },
+                            grid: { color: '#2A2F35' },
+                            title: { display: true, text: 'Tonnes / Week', color: '#A3B1B6' }
                         }
                     }
                 }
             });
         }
 
-        // Scenario Controls Logic
+        // Live Sliders & Scenario Recalculation Logic
         function setupScenarioControls() {
             const sliderDowntime = document.getElementById('slider-downtime');
             const sliderBlast = document.getElementById('slider-blast');
             const valDowntime = document.getElementById('val-downtime');
             const valBlast = document.getElementById('val-blast');
             
-            const baseRF = 912.0; // Base RF forecast tonnes
+            const baseRF = 912.0;
             const target = 1000.0;
 
             function updateScenario() {
@@ -1037,41 +1144,64 @@
                 valDowntime.innerText = downtime.toFixed(1) + " hrs";
                 valBlast.innerText = blast.toFixed(1) + " hrs";
 
-                // Scenario rule calculation formula
-                // Baseline downtime = 8.0 hrs, baseline blast = 2.0 hrs
-                const downtimeDiff = 8.0 - downtime;  // Positive if downtime reduced
-                const blastDiff = 2.0 - blast;        // Positive if blast delay reduced
+                // Scenario rule formula
+                const downtimeDiff = 8.0 - downtime;
+                const blastDiff = 2.0 - blast;
 
-                // Estimated recovery factors
-                const downtimeRecovery = downtimeDiff * 8.5; // ~8.5 tonnes per hour downtime saved
-                const blastRecovery = blastDiff * 6.2;       // ~6.2 tonnes per hour blast delay saved
+                const downtimeRecovery = downtimeDiff * 8.5;
+                const blastRecovery = blastDiff * 6.2;
 
-                const totalRecovered = Math.max(-150.0, downtimeRecovery + blastRecovery);
+                const totalRecovered = downtimeRecovery + blastRecovery;
                 const scenarioForecast = Math.min(1050.0, Math.max(600.0, baseRF + totalRecovered));
 
-                // Update UI
+                // Update UI elements
                 document.getElementById('scen-base-val').innerText = baseRF.toFixed(1) + " t";
                 document.getElementById('scen-new-val').innerText = scenarioForecast.toFixed(1) + " t";
                 
                 const recEl = document.getElementById('scen-recovered');
                 if (totalRecovered >= 0) {
                     recEl.innerText = "+" + totalRecovered.toFixed(1) + " tonnes";
-                    recEl.style.color = "#34d399";
+                    recEl.style.color = "var(--pastel-sage)";
                 } else {
                     recEl.innerText = totalRecovered.toFixed(1) + " tonnes";
-                    recEl.style.color = "#f87171";
+                    recEl.style.color = "var(--pastel-rust)";
+                }
+
+                // Update KPI Cards Live
+                const gap = Math.max(0, target - scenarioForecast);
+                const shortfallPct = (gap / target) * 100.0;
+                document.getElementById('kpi-forecast').innerText = scenarioForecast.toFixed(0) + " t";
+                document.getElementById('kpi-gap').innerText = gap.toFixed(0) + " t";
+
+                const badge = document.getElementById('kpi-risk-badge');
+                if (shortfallPct < 5.0) {
+                    badge.className = "risk-badge risk-low";
+                    badge.innerText = "LOW RISK (" + shortfallPct.toFixed(1) + "%)";
+                } else if (shortfallPct <= 10.0) {
+                    badge.className = "risk-badge risk-medium";
+                    badge.innerText = "MEDIUM RISK (" + shortfallPct.toFixed(1) + "%)";
+                } else {
+                    badge.className = "risk-badge risk-high";
+                    badge.innerText = "HIGH RISK (" + shortfallPct.toFixed(1) + "%)";
                 }
 
                 // Update Recommendation Text
                 const recText = document.getElementById('rec-text');
-                if (downtime < 6.0 && blast < 1.5) {
-                    recText.innerText = "Optimal operational efficiency achieved! High uptime and low blasting delay reduce predicted shortfall by " + totalRecovered.toFixed(1) + " tonnes.";
+                if (downtime <= 4.0 && blast <= 1.0) {
+                    recText.innerText = "Optimal operational recovery! High machinery uptime and minimal blast delay recover " + totalRecovered.toFixed(1) + " tonnes of output.";
                 } else if (downtime > 12.0) {
-                    recText.innerText = "Heavy downtime detected. Prioritize reallocating standby haulage machinery and maintenance crews to prevent shortfall.";
+                    recText.innerText = "High equipment downtime detected. Reallocate standby haulage trucks and dispatch maintenance crews.";
                 } else if (blast > 4.0) {
-                    recText.innerText = "Blasting delay exceeds 4 hours. Review explosive priming and pit clearance schedule to recover ~" + (blast * 6.2).toFixed(1) + " tonnes.";
+                    recText.innerText = "Blasting delay exceeds 4 hours. Review pit clearance and explosive priming schedule to recover ~" + (blast * 6.2).toFixed(1) + " tonnes.";
                 } else {
-                    recText.innerText = "Reducing downtime by " + (8.0 - downtime > 0 ? (8.0 - downtime).toFixed(1) : 0) + " hrs recovers additional production output under scenario assumptions.";
+                    recText.innerText = "Reducing downtime by " + (8.0 - downtime > 0 ? (8.0 - downtime).toFixed(1) : 0) + " hrs recovers additional production output under scenario rules.";
+                }
+
+                // Update Chart live!
+                if (chart && chart.data.datasets.length >= 4) {
+                    const lastIdx = chart.data.datasets[3].data.length - 1;
+                    chart.data.datasets[3].data[lastIdx] = scenarioForecast;
+                    chart.update('none');
                 }
             }
 
@@ -1080,7 +1210,7 @@
             updateScenario();
         }
 
-        // Initialize App
+        // Initialize Dashboard
         window.addEventListener('DOMContentLoaded', () => {
             initMap();
             initChart();
