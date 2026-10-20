@@ -67,6 +67,12 @@ master_data["forecast_results"] = df_fc.to_dict(orient="records")
 with open(os.path.join(PROCESSED_DIR, "forecast_metrics.json"), "r") as f:
     master_data["forecast_metrics"] = json.load(f)
 
+# All-India Mines
+all_mines_path = os.path.join(PROCESSED_DIR, "all_india_mines.json")
+if os.path.exists(all_mines_path):
+    with open(all_mines_path, "r") as f:
+        master_data["all_india_mines"] = json.load(f)
+
 # Save consolidated dataset as JS file and JSON file
 with open(os.path.join(PROCESSED_DIR, "minepulse_master_data.json"), "w") as f:
     json.dump(master_data, f, indent=2)
